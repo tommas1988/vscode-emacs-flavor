@@ -107,9 +107,53 @@
                 "when": "editorTextFocus"
             },
             {
+                "key": "ctrl+p",
+                "command": "showPrevParameterHint",
+                "when": "editorTextFocus && parameterHintsVisible"
+            },
+            {
+                "key": "ctrl+n",
+                "command": "showNextParameterHint",
+                "when": "editorTextFocus && parameterHintsVisible"
+            },
+            {
+                "key": "ctrl+p",
+                "command": "selectPrevQuickFix",
+                "when": "editorFocus && quickFixWidgetVisible"
+            },
+            {
+                "key": "ctrl+n",
+                "command": "selectNextQuickFix",
+                "when": "editorFocus && quickFixWidgetVisible"
+            },
+            {
+                "key": "ctrl+p",
+                "command": "selectPrevSuggestion",
+                "when": "editorTextFocus && suggestWidgetVisible"
+            },
+            {
+                "key": "ctrl+n",
+                "command": "selectNextSuggestion",
+                "when": "editorTextFocus && suggestWidgetVisible"
+            },
+            {
+                "key": "ctrl+p",
+                "command": "workbench.action.quickOpenNavigatePrevious",
+                "when": "inQuickOpen"
+            },
+            {
+                "key": "ctrl+n",
+                "command": "workbench.action.quickOpenNavigateNext",
+                "when": "inQuickOpen"
+            },
+
+
+            {
                 "key": "alt+g g",
                 "command": "workbench.action.gotoLine"
             },
+
+
             {
                 "key": "ctrl+s",
                 "command": "actions.find",
@@ -140,6 +184,8 @@
                 "command": "deleteRight",
                 "when": "editorTextFocus && !editorReadonly"
             },
+
+
             {
                 "key": "alt+d",
                 "command": "emacs.kill-word",
@@ -165,26 +211,36 @@
                 "command": "emacs.kill-ring-save",
                 "when": "editorTextFocus"
             },
+
+
             {
                 "key": "ctrl+y",
                 "command": "emacs.yank",
                 "when": "editorTextFocus && !editorReadonly"
             },
+
+            
             {
                 "key": "ctrl+x h",
                 "command": "editor.action.selectAll",
                 "when": "editorTextFocus"
             },
+
+            
             {
                 "key": "ctrl+/",
-                "command": "emacs.C-/",
+                "command": "emacs.undo",
                 "when": "editorTextFocus && !editorReadonly"
             },
+
+            
             {
                 "key": "ctrl+x u",
                 "command": "emacs.undo",
                 "when": "editorTextFocus && !editorReadonly"
             },
+
+            
             {
                 "key": "ctrl+c ctrl+c",
                 "command": "editor.action.commentLine",
@@ -195,11 +251,15 @@
                 "command": "editor.action.blockComment",
                 "when": "editorTextFocus && !editorReadonly"
             },
+
+            
             {
                 "key": "ctrl+l",
                 "command": "emacs.recenter-top-bottom",
                 "when": "editorTextFocus"
             },
+
+
             {
                 "key": "ctrl+g",
                 "command": "emacs.keyboard-quit",
@@ -280,15 +340,21 @@
                 "command": "workbench.action.closeQuickOpen",
                 "when": "inQuickOpen"
             },
+            
+            
             {
                 "key": "ctrl+space",
                 "command": "emacs.set-mark-command",
                 "when": "editorTextFocus"
             },
+            
+            
             {
                 "key": "ctrl+x ctrl+f",
                 "command": "workbench.action.quickOpen"
             },
+            
+            
             {
                 "key": "ctrl+x ctrl+s",
                 "command": "workbench.action.files.save",
@@ -299,6 +365,8 @@
                 "command": "workbench.action.files.saveAs",
                 "when": "editorTextFocus"
             },
+            
+            
             {
                 "key": "ctrl+x k",
                 "command": "workbench.action.closeActiveEditor"
@@ -329,46 +397,6 @@
                 "command": "workbench.action.navigateEditorGroups"
             },
             {
-                "key": "ctrl+p",
-                "command": "showPrevParameterHint",
-                "when": "editorTextFocus && parameterHintsVisible"
-            },
-            {
-                "key": "ctrl+n",
-                "command": "showNextParameterHint",
-                "when": "editorTextFocus && parameterHintsVisible"
-            },
-            {
-                "key": "ctrl+p",
-                "command": "selectPrevQuickFix",
-                "when": "editorFocus && quickFixWidgetVisible"
-            },
-            {
-                "key": "ctrl+n",
-                "command": "selectNextQuickFix",
-                "when": "editorFocus && quickFixWidgetVisible"
-            },
-            {
-                "key": "ctrl+p",
-                "command": "selectPrevSuggestion",
-                "when": "editorTextFocus && suggestWidgetVisible"
-            },
-            {
-                "key": "ctrl+n",
-                "command": "selectNextSuggestion",
-                "when": "editorTextFocus && suggestWidgetVisible"
-            },
-            {
-                "key": "ctrl+p",
-                "command": "workbench.action.quickOpenNavigatePrevious",
-                "when": "inQuickOpen"
-            },
-            {
-                "key": "ctrl+n",
-                "command": "workbench.action.quickOpenNavigateNext",
-                "when": "inQuickOpen"
-            },
-            {
                 "key": "alt+x",
                 "command": "workbench.action.showCommands"
             },
@@ -376,6 +404,8 @@
                 "key": "ctrl+x b",
                 "command": "workbench.action.showAllEditors"
             },
+            
+            
             {
                 "key": "ctrl+x ctrl+l",
                 "command": "editor.action.transformToLowercase",
