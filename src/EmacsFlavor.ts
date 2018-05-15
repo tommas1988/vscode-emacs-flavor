@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as EmacsCommand from './commands';
 
-export class EmacsFlavor {
+export default class EmacsFlavor {
     private commands: string[] = [
         // Moving Point
         'forward-char',
@@ -77,7 +77,7 @@ export class EmacsFlavor {
         'input-box',
     ];
 
-    public constructor(context: vscode.ExtensionContext) {
+    public init(context: vscode.ExtensionContext) {
         this.registerCommands(context);
     }
 
@@ -98,7 +98,7 @@ export class EmacsFlavor {
     }
 
     private registerCommand(context: vscode.ExtensionContext, command: string) {
-        let handler = command.replace(/(-|\.)[a-xA-Z]/, (replacement: string) => {
+        let handler = command.replace(/(-|\.)[a-xA-Z]/g, (replacement: string) => {
             return replacement.charAt(1).toUpperCase();
         });
         
@@ -106,7 +106,8 @@ export class EmacsFlavor {
             return;
         }
 
-        context.subscriptions.push(vscode.commands.registerCommand(`emacs.${command}`, Reflect.get(EmacsCommand, handler)));
+        command = `emacs.${command}`;
+        context.subscriptions.push(vscode.commands.registerCommand(command, Reflect.get(EmacsCommand, handler)));
         console.log(`Registered handler: ${handler} for command: ${command}`);
     }
 }

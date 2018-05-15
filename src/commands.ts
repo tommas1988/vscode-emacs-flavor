@@ -9,7 +9,7 @@ type cursorMovement = 'cursorUp' | 'cursorDown' | 'cursorLeft' | 'cursorRight' |
     | 'cursorWordLeft' | 'cursorWordRight' | 'cursorPageDown' | 'cursorPageUp' | 'cursorTop' | 'cursorBottom';
 
 function cursorMove(movement: cursorMovement) {
-    vscode.commands.executeCommand(movement + (state & STATE_MARK_ACTIVE) ? 'Select' : '');
+    vscode.commands.executeCommand(movement + ((state & STATE_MARK_ACTIVE) === 0 ? '' : 'Select'));
 }
 
 export function forwardChar() {
