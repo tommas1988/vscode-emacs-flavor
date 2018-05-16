@@ -1,6 +1,8 @@
 import * as vscode from 'vscode';
+import EmacsFlavor from './EmacsFlavor';
 
 let state: number = 0;
+let mark_position: vscode.Position | null = null;
 
 const STATE_MASK = 2;
 const STATE_MARK_ACTIVE = 1;
@@ -50,4 +52,13 @@ export function scrollUpCommand() {
 
 export function scrollDownCommand() {
     cursorMove('cursorPageUp');
+}
+
+export function setMarkCommand(emacs: EmacsFlavor) {
+    if (emacs.lastCommandHandler === setMarkCommand) {
+        state &= (~STATE_MARK_ACTIVE);
+    } else {
+        mark_position = vscode.window.activeTextEditor.selection.active;
+        state |= STATE_MARK_ACTIVE;
+    }
 }

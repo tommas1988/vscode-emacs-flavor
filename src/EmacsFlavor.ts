@@ -21,6 +21,12 @@ export default class EmacsFlavor {
         'scroll-down-command',
         'goto-line',
         'set-goal-column',
+
+        // Setting Mark
+        'set-mark-command',
+        'exchange-point-and-mark',
+        'mark-whole-buffer',
+        'pop-global-mark',
     
         // Deletion
         'delete-backward-char',
@@ -60,7 +66,6 @@ export default class EmacsFlavor {
         'save-buffer',
     
         // misc.
-        'set-mark-command',
         'keyboard-quit',
         'recenter-top-bottom',
         'downcase-region',
@@ -76,6 +81,8 @@ export default class EmacsFlavor {
     private commandSuffixes: string[] = [
         'input-box',
     ];
+
+    public lastCommandHandler: ((...args: any[]) => any) | null = null;
 
     public init(context: vscode.ExtensionContext) {
         this.registerCommands(context);
@@ -98,16 +105,20 @@ export default class EmacsFlavor {
     }
 
     private registerCommand(context: vscode.ExtensionContext, command: string) {
-        let handler = command.replace(/(-|\.)[a-xA-Z]/g, (replacement: string) => {
+        let handlerName = command.replace(/(-|\.)[a-xA-Z]/g, (replacement: string) => {
             return replacement.charAt(1).toUpperCase();
         });
         
-        if (!Reflect.has(EmacsCommand, handler)) {
+        if (!Reflect.has(EmacsCommand, handlerName)) {
             return;
         }
 
         command = `emacs.${command}`;
-        context.subscriptions.push(vscode.commands.registerCommand(command, Reflect.get(EmacsCommand, handler)));
-        console.log(`Registered handler: ${handler} for command: ${command}`);
+        context.subscriptions.push(vscode.commands.registerCommand(command, () => {
+            let handler = Reflect.get(EmacsCommand, handlerName);
+            handler(this);
+            this.lastCommandHandler = handler;
+        }));
+        console.log(`Registered handler: ${handlerName} for command: ${command}`);
     }
 }
