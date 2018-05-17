@@ -1,6 +1,8 @@
 import * as vscode from 'vscode';
 import EmacsFlavor from './EmacsFlavor';
 
+/// <reference path="./vscode_plus.d.ts" />
+
 let state: number = 0;
 let mark_position: vscode.Position | null = null;
 
@@ -56,9 +58,44 @@ export function scrollDownCommand() {
 
 export function setMarkCommand(emacs: EmacsFlavor) {
     if (emacs.lastCommandHandler === setMarkCommand) {
-        state &= (~STATE_MARK_ACTIVE);
+        deactiveMark();
     } else {
         mark_position = vscode.window.activeTextEditor.selection.active;
         state |= STATE_MARK_ACTIVE;
     }
+}
+
+export function exchangePointAndMark() {
+    if (!mark_position) {
+        return;
+    }
+    let point_postion = vscode.window.activeTextEditor.selection.active;
+
+    moveCursor(true, mark_position);
+    state |= STATE_MARK_ACTIVE;
+    mark_position = point_postion;
+}
+
+export function keyboardQuit() {
+    if (state & STATE_MARK_ACTIVE) {
+        deactiveMark();
+    }
+}
+
+function deactiveMark() {
+    state &= (~STATE_MARK_ACTIVE);
+    vscode.commands.executeCommand("cancelSelection");
+}
+
+function moveCursor(selection: boolean, position: vscode.Position) {
+    let cursors = vscode.window.activeTextEditor._getCursors();
+    cursors.context.model.pushStackElement();
+	cursors.setStates(
+		undefined,
+		0,
+		[
+			vscode.CursorMoveCommands.moveTo(cursors.context, cursors.getPrimaryCursor(), selection, position)
+		]
+	);
+    cursors.reveal(true, 0, /* 0: Smooth, 1: Immediate */ 1);
 }
