@@ -1,13 +1,17 @@
 import * as vscode from 'vscode';
 import EmacsFlavor from './EmacsFlavor';
+import { Buffer } from './Buffer';
 
-/// <reference path="./vscode_plus.d.ts" />
+const buffers = new Buffer();
 
 let state: number = 0;
-let mark_position: vscode.Position | null = null;
 
 const STATE_MASK = 2;
 const STATE_MARK_ACTIVE = 1;
+
+vscode.window.onDidChangeActiveTextEditor(event => {
+    state &= (~STATE_MARK_ACTIVE);
+});
 
 type cursorMovement = 'cursorUp' | 'cursorDown' | 'cursorLeft' | 'cursorRight' | 'cursorHome' | 'cursorEnd'
     | 'cursorWordLeft' | 'cursorWordRight' | 'cursorPageDown' | 'cursorPageUp' | 'cursorTop' | 'cursorBottom';
@@ -60,20 +64,27 @@ export function setMarkCommand(emacs: EmacsFlavor) {
     if (emacs.lastCommandHandler === setMarkCommand) {
         deactiveMark();
     } else {
-        mark_position = vscode.window.activeTextEditor.selection.active;
+        let markRing = buffers.getActiveBuffer().markRing;
+        markRing.marks.unshift(vscode.window.activeTextEditor.selection.active);
+        markRing.pointer = 0;
+
         state |= STATE_MARK_ACTIVE;
     }
 }
 
 export function exchangePointAndMark() {
-    if (!mark_position) {
+    let markRing = buffers.getActiveBuffer().markRing;
+    if (markRing.marks.length === 0) {
         return;
     }
-    let point_postion = vscode.window.activeTextEditor.selection.active;
 
-    moveCursor(true, mark_position);
+    let editor = vscode.window.activeTextEditor;
+    let point_postion = editor.selection.active;
+    let selection = new vscode.Selection(point_postion, markRing.marks[markRing.pointer]);
+
+    editor.selection = selection;
     state |= STATE_MARK_ACTIVE;
-    mark_position = point_postion;
+    markRing.marks.unshift(point_postion);
 }
 
 export function keyboardQuit() {
@@ -85,17 +96,4 @@ export function keyboardQuit() {
 function deactiveMark() {
     state &= (~STATE_MARK_ACTIVE);
     vscode.commands.executeCommand("cancelSelection");
-}
-
-function moveCursor(selection: boolean, position: vscode.Position) {
-    let cursors = vscode.window.activeTextEditor._getCursors();
-    cursors.context.model.pushStackElement();
-	cursors.setStates(
-		undefined,
-		0,
-		[
-			vscode.CursorMoveCommands.moveTo(cursors.context, cursors.getPrimaryCursor(), selection, position)
-		]
-	);
-    cursors.reveal(true, 0, /* 0: Smooth, 1: Immediate */ 1);
 }

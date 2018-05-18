@@ -147,6 +147,16 @@
                 "when": "inQuickOpen"
             },
             {
+                "key": "ctrl+space",
+                "command": "emacs.set-mark-command",
+                "when": "editorTextFocus"
+            },
+            {
+                "key": "ctrl+x ctrl+x",
+                "command": "emacs.exchange-point-and-mark",
+                "when": "editorTextFocus"
+            },
+            {
                 "key": "alt+g g",
                 "command": "workbench.action.gotoLine"
             },
@@ -319,11 +329,6 @@
                 "key": "ctrl+g",
                 "command": "workbench.action.closeQuickOpen",
                 "when": "inQuickOpen"
-            },
-            {
-                "key": "ctrl+space",
-                "command": "emacs.set-mark-command",
-                "when": "editorTextFocus"
             },
             {
                 "key": "ctrl+x ctrl+f",

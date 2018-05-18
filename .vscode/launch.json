@@ -9,7 +9,7 @@
             "name": "Extension",
             "type": "extensionHost",
             "request": "launch",
-            "runtimeExecutable": "${execPath}",
+            "runtimeExecutable": "D:\\Repos\\vscode\\scripts\\code.bat",
             "args": [
                 "--extensionDevelopmentPath=${workspaceFolder}"
             ],
