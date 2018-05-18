@@ -1,12 +1,8 @@
 import * as vscode from 'vscode';
-
-export interface MarkRing {
-    marks: vscode.Position[],
-    pointer: number,
-}
+import { MarkRing } from './Ring';
 
 export interface BufferEntry{
-    markRing: MarkRing
+    markRing: MarkRing;
 }
 
 export class Buffer {
@@ -16,7 +12,7 @@ export class Buffer {
         let editor = vscode.window.activeTextEditor;
         if (!this.buffers.has(editor)) {
             this.buffers.set(editor, {
-                markRing: { marks: [], pointer: 0 },
+                markRing: new MarkRing(),
             }); 
         }
 

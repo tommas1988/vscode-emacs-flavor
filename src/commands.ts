@@ -1,13 +1,15 @@
 import * as vscode from 'vscode';
 import EmacsFlavor from './EmacsFlavor';
 import { Buffer } from './Buffer';
+import { KillRing } from './Ring';
 
 const buffers = new Buffer();
+const killRing = new KillRing();
 
 let state: number = 0;
 
-const STATE_MASK = 2;
 const STATE_MARK_ACTIVE = 1;
+const STATE_MASK = 2;
 
 vscode.window.onDidChangeActiveTextEditor(event => {
     state &= (~STATE_MARK_ACTIVE);
@@ -65,7 +67,7 @@ export function setMarkCommand(emacs: EmacsFlavor) {
         deactiveMark();
     } else {
         let markRing = buffers.getActiveBuffer().markRing;
-        markRing.marks.unshift(vscode.window.activeTextEditor.selection.active);
+        markRing.insert(vscode.window.activeTextEditor.selection.active);
         markRing.pointer = 0;
 
         state |= STATE_MARK_ACTIVE;
@@ -74,17 +76,17 @@ export function setMarkCommand(emacs: EmacsFlavor) {
 
 export function exchangePointAndMark() {
     let markRing = buffers.getActiveBuffer().markRing;
-    if (markRing.marks.length === 0) {
+    if (markRing.isEmpty()) {
         return;
     }
 
     let editor = vscode.window.activeTextEditor;
     let point_postion = editor.selection.active;
-    let selection = new vscode.Selection(point_postion, markRing.marks[markRing.pointer]);
+    let selection = new vscode.Selection(point_postion, markRing.mark);
 
     editor.selection = selection;
     state |= STATE_MARK_ACTIVE;
-    markRing.marks.unshift(point_postion);
+    markRing.insert(point_postion);
 }
 
 export function keyboardQuit() {
