@@ -221,6 +221,11 @@
                 "when": "editorTextFocus && !editorReadonly"
             },
             {
+                "key": "alt+y",
+                "command": "emacs.yank-pop",
+                "when": "editorTextFocus && !editorReadonly"
+            },
+            {
                 "key": "ctrl+x h",
                 "command": "editor.action.selectAll",
                 "when": "editorTextFocus"
@@ -259,11 +264,6 @@
                 "key": "ctrl+g",
                 "command": "closeFindWidget",
                 "when": "editorFocus && findWidgetVisible"
-            },
-            {
-                "key": "ctrl+g",
-                "command": "emacs.exitMarkMode",
-                "when": "editorTextFocus && editorHasSelection"
             },
             {
                 "key": "ctrl+g",
@@ -401,10 +401,14 @@
         "test": "npm run compile && node ./node_modules/vscode/bin/test"
     },
     "devDependencies": {
+        "@types/clipboardy": "^1.1.0",
         "@types/mocha": "^2.2.42",
         "@types/node": "^7.0.64",
         "tslint": "^5.10.0",
         "typescript": "^2.6.1",
         "vscode": "^1.1.17"
+    },
+    "dependencies": {
+        "clipboardy": "^1.2.3"
     }
 }

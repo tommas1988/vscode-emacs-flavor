@@ -76,16 +76,34 @@ export default class EmacsFlavor {
     private vsCommandMap: any = {
         'delete-forward-char': 'deleteRight',
         'goto-line': 'workbench.action.gotoLine',
+        'downcase-region': 'editor.action.transformToLowercase',
+        'upcase-region': 'editor.action.transformToUppercase',
     };
 
     private commandSuffixes: string[] = [
         'input-box',
     ];
 
+    public static readonly COMMAND_UNHANDLED = -1;
+
     public lastCommandHandler: ((...args: any[]) => any) | null = null;
+    public lastChangeRange: vscode.Range | undefined;
+
+    public state: number = 0;
+
+    public readonly STATE_MARK_ACTIVE = 1;
+    public readonly STATE_MASK = 2;
 
     public init(context: vscode.ExtensionContext) {
         this.registerCommands(context);
+        
+        vscode.window.onDidChangeActiveTextEditor(event => {
+            this.state &= (~this.STATE_MARK_ACTIVE);
+        });
+
+        vscode.workspace.onDidChangeTextDocument(e => {
+            this.lastChangeRange = e.contentChanges[0].range;
+        });
     }
 
     private registerCommands(context: vscode.ExtensionContext) {
@@ -108,7 +126,7 @@ export default class EmacsFlavor {
         let handlerName = command.replace(/(-|\.)[a-xA-Z]/g, (replacement: string) => {
             return replacement.charAt(1).toUpperCase();
         });
-        
+
         if (!Reflect.has(EmacsCommand, handlerName)) {
             return;
         }
@@ -116,8 +134,10 @@ export default class EmacsFlavor {
         command = `emacs.${command}`;
         context.subscriptions.push(vscode.commands.registerCommand(command, () => {
             let handler = Reflect.get(EmacsCommand, handlerName);
-            handler(this);
-            this.lastCommandHandler = handler;
+            // handler.apply(this);
+            if (handler(this) !== EmacsFlavor.COMMAND_UNHANDLED) {
+                this.lastCommandHandler = handler;
+            }
         }));
         console.log(`Registered handler: ${handlerName} for command: ${command}`);
     }
