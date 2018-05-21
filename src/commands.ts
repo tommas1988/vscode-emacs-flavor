@@ -87,6 +87,10 @@ export function keyboardQuit(emacs: EmacsFlavor) {
     if (emacs.state & emacs.STATE_MARK_ACTIVE) {
         deactiveMark(emacs);
     }
+
+    if (undo === emacs.lastCommandHandler) {
+        emacs.redoSwitch = !emacs.redoSwitch;
+    }
 }
 
 function deactiveMark(emacs: EmacsFlavor) {
@@ -100,11 +104,10 @@ export function killLine() {
     let pointPosition = editor.selection.active;
     let line: vscode.TextLine = document.lineAt(pointPosition);
 
-    let range: vscode.Range;
-    if (line.isEmptyOrWhitespace) {
+    let range: vscode.Range = line.range.with(pointPosition);
+    let text = document.getText(range);
+    if (!text || /^\s*$/.test(text)) {
         range = line.rangeIncludingLineBreak.with(pointPosition);
-    } else {
-        range = line.range.with(pointPosition);
     }
 
     editor.edit((editBuilder) => {
@@ -181,4 +184,10 @@ export function yankPop(emacs: EmacsFlavor) {
     editor.edit(editBuilder => {
         editBuilder._pushEdit(range, text, true);
     });
+}
+
+export function undo(emacs: EmacsFlavor) {
+    let action = emacs.redoSwitch ? 'redo' : 'undo';
+    vscode.window.setStatusBarMessage(action, 1000);
+    vscode.commands.executeCommand(action);
 }

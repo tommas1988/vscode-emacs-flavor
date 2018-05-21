@@ -86,23 +86,24 @@ export default class EmacsFlavor {
 
     public static readonly COMMAND_UNHANDLED = -1;
 
-    public lastCommandHandler: ((...args: any[]) => any) | null = null;
-    public lastChangeRange: vscode.Range | undefined;
-
-    public state: number = 0;
-
     public readonly STATE_MARK_ACTIVE = 1;
     public readonly STATE_MASK = 2;
 
+    public lastCommandHandler: ((...args: any[]) => any) | null = null;
+
+    public state: number = 0;
+
+    public redoSwitch: boolean = false;
+
     public init(context: vscode.ExtensionContext) {
         this.registerCommands(context);
-        
-        vscode.window.onDidChangeActiveTextEditor(event => {
-            this.state &= (~this.STATE_MARK_ACTIVE);
-        });
 
         vscode.workspace.onDidChangeTextDocument(e => {
-            this.lastChangeRange = e.contentChanges[0].range;
+            this.state &= (~this.STATE_MARK_ACTIVE);
+
+            if (EmacsCommand.undo !== this.lastCommandHandler) {
+                this.redoSwitch = false;
+            }
         });
     }
 
@@ -111,6 +112,7 @@ export default class EmacsFlavor {
             let vsCommand = this.vsCommandMap[command];
             if (vsCommand) {
                 // use builtin command
+                console.log(`Registered command: ${command}`);
                 return;
             }
 
@@ -131,14 +133,13 @@ export default class EmacsFlavor {
             return;
         }
 
-        command = `emacs.${command}`;
-        context.subscriptions.push(vscode.commands.registerCommand(command, () => {
+        context.subscriptions.push(vscode.commands.registerCommand(`emacs.${command}`, () => {
             let handler = Reflect.get(EmacsCommand, handlerName);
             // handler.apply(this);
             if (handler(this) !== EmacsFlavor.COMMAND_UNHANDLED) {
                 this.lastCommandHandler = handler;
             }
         }));
-        console.log(`Registered handler: ${handlerName} for command: ${command}`);
+        console.log(`Registered command: ${command}`);
     }
 }

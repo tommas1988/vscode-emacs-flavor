@@ -161,6 +161,10 @@
                 "command": "workbench.action.gotoLine"
             },
             {
+                "key": "alt+g alt+g",
+                "command": "workbench.action.gotoLine"
+            },
+            {
                 "key": "ctrl+s",
                 "command": "actions.find",
                 "when": "!findWidgetVisible"
