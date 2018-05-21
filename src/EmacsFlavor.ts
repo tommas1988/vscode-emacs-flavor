@@ -98,6 +98,11 @@ export default class EmacsFlavor {
     public init(context: vscode.ExtensionContext) {
         this.registerCommands(context);
 
+        vscode.window.onDidChangeActiveTextEditor(event => {
+            this.state &= (~this.STATE_MARK_ACTIVE);
+			this.redoSwitch = false;
+		});
+
         vscode.workspace.onDidChangeTextDocument(e => {
             this.state &= (~this.STATE_MARK_ACTIVE);
 
