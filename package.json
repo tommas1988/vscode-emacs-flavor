@@ -270,6 +270,10 @@
                 "when": "editorTextFocus"
             },
             {
+                "key": "alt+x",
+                "command": "workbench.action.showCommands"
+            },
+            {
                 "key": "ctrl+g",
                 "command": "closeFindWidget",
                 "when": "editorFocus && findWidgetVisible"

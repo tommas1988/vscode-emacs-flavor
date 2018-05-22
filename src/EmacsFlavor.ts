@@ -70,6 +70,7 @@ export default class EmacsFlavor {
         // misc.
         'universal-argument',
         'keyboard-quit',
+        'execute-extended-command',
         'downcase-region',
         'upcase-region',
     ];
@@ -78,6 +79,7 @@ export default class EmacsFlavor {
     private vsCommandMap: any = {
         'delete-forward-char': 'deleteRight',
         'goto-line': 'workbench.action.gotoLine',
+        'execute-extended-command': 'workbench.action.showCommands',
     };
 
     public static readonly COMMAND_UNHANDLED = -1;
