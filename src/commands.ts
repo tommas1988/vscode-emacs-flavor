@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
 import * as clipboard from 'clipboardy';
-import EmacsFlavor from './EmacsFlavor';
-import { Buffer } from './Buffer';
-import { KillRing } from './Ring';
+import EmacsFlavor from './emacsFlavor';
+import { Buffer } from './buffer';
+import { KillRing } from './ring';
 
 /// <reference path="./vscode-plus.d.ts" />
 
