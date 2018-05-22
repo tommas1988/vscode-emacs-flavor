@@ -265,6 +265,11 @@
                 "when": "editorTextFocus"
             },
             {
+                "key": "ctrl+u",
+                "command": "emacs.universal-argument",
+                "when": "editorTextFocus"
+            },
+            {
                 "key": "ctrl+g",
                 "command": "closeFindWidget",
                 "when": "editorFocus && findWidgetVisible"
@@ -387,13 +392,26 @@
             },
             {
                 "key": "ctrl+x ctrl+l",
-                "command": "editor.action.transformToLowercase",
+                "command": "emacs.downcase-region",
                 "when": "editorTextFocus && !editorReadonly"
             },
             {
                 "key": "ctrl+x ctrl+u",
-                "command": "editor.action.transformToUppercase",
+                "command": "emacs.upcase-region",
                 "when": "editorTextFocus && !editorReadonly"
+            },
+            {
+                "key": "alt+.",
+                "command": "editor.action.goToDeclaration",
+                "when": "editorHasDefinitionProvider && editorTextFocus && !isInEmbeddedEditor"
+            },
+            {
+                "key": "ctrl+c ctrl+p",
+                "command": "workbench.action.navigateBack"
+            },
+            {
+                "key": "ctrl+c ctrl+n",
+                "command": "workbench.action.navigateForward"
             }
         ]
     },

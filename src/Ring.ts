@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
 
 abstract class Ring<T> {
-    private items: T[] = [];
-    private readonly max: number = 10;
+    protected items: T[] = [];
+    protected max: number = 10;
     public pointer: number = 0;
 
     protected getItem():T {
@@ -15,9 +15,9 @@ abstract class Ring<T> {
 
     pop(): T {
         let length = this.items.length;
-        let pointer = (this.pointer === length - 1) ? 0 : this.pointer + 1;
+        let pointer = this.pointer;
 
-        this.pointer = pointer;
+        this.pointer = (pointer === length - 1) ? 0 : pointer + 1;;
         return this.items[pointer];
     }
 
@@ -39,5 +39,13 @@ export class MarkRing extends Ring<vscode.Position> {
 export class KillRing extends Ring<string> {
     get kill(): string {
         return this.getItem();
+    }
+}
+
+export class RecenterRing extends Ring<'center' | 'top' | 'bottom'> {
+    constructor() {
+        super();
+        this.items = [ 'center', 'top', 'bottom' ];
+        this.max = 3;
     }
 }

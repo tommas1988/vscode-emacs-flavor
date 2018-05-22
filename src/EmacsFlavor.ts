@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import * as EmacsCommand from './commands';
+import { RecenterRing } from './Ring';
 
 export default class EmacsFlavor {
     private commands: string[] = [
@@ -21,6 +22,7 @@ export default class EmacsFlavor {
         'scroll-down-command',
         'goto-line',
         'set-goal-column',
+        'recenter-top-bottom',
 
         // Setting Mark
         'set-mark-command',
@@ -66,8 +68,8 @@ export default class EmacsFlavor {
         'save-buffer',
     
         // misc.
+        'universal-argument',
         'keyboard-quit',
-        'recenter-top-bottom',
         'downcase-region',
         'upcase-region',
     ];
@@ -76,13 +78,7 @@ export default class EmacsFlavor {
     private vsCommandMap: any = {
         'delete-forward-char': 'deleteRight',
         'goto-line': 'workbench.action.gotoLine',
-        'downcase-region': 'editor.action.transformToLowercase',
-        'upcase-region': 'editor.action.transformToUppercase',
     };
-
-    private commandSuffixes: string[] = [
-        'input-box',
-    ];
 
     public static readonly COMMAND_UNHANDLED = -1;
 
@@ -93,18 +89,26 @@ export default class EmacsFlavor {
 
     public state: number = 0;
 
+    public argumentActive: boolean = false;
+
     public redoSwitch: boolean = false;
+
+    public recenterRing = new RecenterRing();
 
     public init(context: vscode.ExtensionContext) {
         this.registerCommands(context);
 
         vscode.window.onDidChangeActiveTextEditor(event => {
             this.state &= (~this.STATE_MARK_ACTIVE);
-			this.redoSwitch = false;
-		});
+            this.argumentActive = false;
+            this.redoSwitch = false;
+            this.recenterRing.pointer = 0;
+        });
 
         vscode.workspace.onDidChangeTextDocument(e => {
             this.state &= (~this.STATE_MARK_ACTIVE);
+            this.argumentActive = false;
+            this.recenterRing.pointer = 0;
 
             if (EmacsCommand.undo !== this.lastCommandHandler) {
                 this.redoSwitch = false;
@@ -122,10 +126,8 @@ export default class EmacsFlavor {
             }
 
             this.registerCommand(context, command);
-
-            this.commandSuffixes.forEach(suffix => {
-                this.registerCommand(context, `command.${suffix}`);
-            });
+            // argument version emacs command
+            this.registerCommand(context, `argument.${command}`);
         });
     }
 

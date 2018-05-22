@@ -56,15 +56,45 @@ export function scrollDownCommand(emacs: EmacsFlavor) {
     cursorMove(emacs, 'cursorPageUp');
 }
 
+export function recenterTopBottom(emacs: EmacsFlavor) {
+    if (recenterTopBottom !== emacs.lastCommandHandler) {
+        emacs.recenterRing.pointer = 0;
+    }
+
+    const editor = <vscode.TextEditor> vscode.window.activeTextEditor;
+    switch (emacs.recenterRing.pop()) {
+        case 'center':
+            editor.revealRange(editor.selection, vscode.TextEditorRevealType.InCenter);
+            break;
+        case 'top':
+            editor.revealRange(editor.selection, vscode.TextEditorRevealType.AtTop);
+            break;
+        case 'bottom':
+            vscode.commands.executeCommand("scrollPageUp");
+            break;
+    }
+}
+
 export function setMarkCommand(emacs: EmacsFlavor) {
     if (emacs.lastCommandHandler === setMarkCommand) {
         deactiveMark(emacs);
     } else {
         let markRing = buffers.getActiveBuffer().markRing;
-        markRing.insert((<vscode.TextEditor> vscode.window.activeTextEditor).selection.active);
-        markRing.pointer = 0;
+        if (!emacs.argumentActive) {
+            markRing.insert((<vscode.TextEditor> vscode.window.activeTextEditor).selection.active);
+            markRing.pointer = 0;
+            emacs.state |= emacs.STATE_MARK_ACTIVE;
+        } else {
+            if (emacs.state & emacs.STATE_MARK_ACTIVE) {
+                deactiveMark(emacs);
+            }
 
-        emacs.state |= emacs.STATE_MARK_ACTIVE;
+            markRing.pop();
+            let markPosition = markRing.mark;
+            (<vscode.TextEditor> vscode.window.activeTextEditor).selection = new vscode.Selection(markPosition, markPosition);
+
+            emacs.argumentActive = false;
+        }
     }
 }
 
@@ -83,10 +113,17 @@ export function exchangePointAndMark(emacs: EmacsFlavor) {
     markRing.insert(pointPosition);
 }
 
+export function universalArgument(emacs: EmacsFlavor) {
+    emacs.argumentActive = true;
+    vscode.window.setStatusBarMessage('argument setted', 1000);
+}
+
 export function keyboardQuit(emacs: EmacsFlavor) {
     if (emacs.state & emacs.STATE_MARK_ACTIVE) {
         deactiveMark(emacs);
     }
+
+    emacs.argumentActive = false;
 
     if (undo === emacs.lastCommandHandler) {
         emacs.redoSwitch = !emacs.redoSwitch;
@@ -95,7 +132,7 @@ export function keyboardQuit(emacs: EmacsFlavor) {
 
 function deactiveMark(emacs: EmacsFlavor) {
     emacs.state &= (~emacs.STATE_MARK_ACTIVE);
-    vscode.commands.executeCommand("cancelSelection");
+    vscode.commands.executeCommand('cancelSelection');
 }
 
 export function killLine() {
@@ -190,4 +227,18 @@ export function undo(emacs: EmacsFlavor) {
     let action = emacs.redoSwitch ? 'redo' : 'undo';
     vscode.window.setStatusBarMessage(action, 1000);
     vscode.commands.executeCommand(action);
+}
+
+export function downcaseRegion() {
+    vscode.commands.executeCommand('editor.action.transformToLowercase')
+        .then(() => {
+            vscode.commands.executeCommand('cancelSelection');
+        });
+}
+
+export function upcaseRegion() {
+    vscode.commands.executeCommand('editor.action.transformToUppercase')
+        .then(() => {
+            vscode.commands.executeCommand('cancelSelection');
+        });
 }
