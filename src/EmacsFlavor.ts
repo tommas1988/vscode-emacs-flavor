@@ -82,6 +82,10 @@ export default class EmacsFlavor {
         'execute-extended-command': 'workbench.action.showCommands',
     };
 
+    private privateCommands: string[] = [
+        'isearch-stop',
+    ];
+
     public static readonly COMMAND_UNHANDLED = -1;
 
     public readonly STATE_MARK_ACTIVE = 1;
@@ -90,6 +94,8 @@ export default class EmacsFlavor {
     public lastCommandHandler: ((...args: any[]) => any) | null = null;
 
     public state: number = 0;
+
+    public searchOriginPosition: vscode.Position | null = null;
 
     public argumentActive: boolean = false;
 
@@ -105,6 +111,11 @@ export default class EmacsFlavor {
             this.argumentActive = false;
             this.redoSwitch = false;
             this.recenterRing.pointer = 0;
+
+            if (this.searchOriginPosition) {
+                vscode.commands.executeCommand('closeFindWidget');
+                this.searchOriginPosition = null;
+            }
         });
 
         vscode.workspace.onDidChangeTextDocument(e => {
@@ -127,28 +138,33 @@ export default class EmacsFlavor {
                 return;
             }
 
+            if (this.registerCommand(context, command)) {
+                console.log(`Registered command: ${command}`);
+            }
+        });
+
+        this.privateCommands.forEach(command => {
             this.registerCommand(context, command);
-            // argument version emacs command
-            this.registerCommand(context, `argument.${command}`);
         });
     }
 
-    private registerCommand(context: vscode.ExtensionContext, command: string) {
-        let handlerName = command.replace(/(-|\.)[a-xA-Z]/g, (replacement: string) => {
+    private registerCommand(context: vscode.ExtensionContext, commandName: string): boolean {
+        let handlerName = commandName.replace(/(-|\.)[a-xA-Z]/g, (replacement: string) => {
             return replacement.charAt(1).toUpperCase();
         });
 
         if (!Reflect.has(EmacsCommand, handlerName)) {
-            return;
+            return false;
         }
 
-        context.subscriptions.push(vscode.commands.registerCommand(`emacs.${command}`, () => {
+        context.subscriptions.push(vscode.commands.registerCommand(`emacs.${commandName}`, () => {
             let handler = Reflect.get(EmacsCommand, handlerName);
             // handler.apply(this);
             if (handler(this) !== EmacsFlavor.COMMAND_UNHANDLED) {
                 this.lastCommandHandler = handler;
             }
         }));
-        console.log(`Registered command: ${command}`);
+
+        return true;
     }
 }

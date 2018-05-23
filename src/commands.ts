@@ -56,12 +56,16 @@ export function scrollDownCommand(emacs: EmacsFlavor) {
     cursorMove(emacs, 'cursorPageUp');
 }
 
+function activeEditor(): vscode.TextEditor {
+    return <vscode.TextEditor> vscode.window.activeTextEditor;
+}
+
 export function recenterTopBottom(emacs: EmacsFlavor) {
     if (recenterTopBottom !== emacs.lastCommandHandler) {
         emacs.recenterRing.pointer = 0;
     }
 
-    const editor = <vscode.TextEditor> vscode.window.activeTextEditor;
+    const editor = activeEditor();
     switch (emacs.recenterRing.pop()) {
         case 'center':
             editor.revealRange(editor.selection, vscode.TextEditorRevealType.InCenter);
@@ -81,7 +85,7 @@ export function setMarkCommand(emacs: EmacsFlavor) {
     } else {
         let markRing = buffers.getActiveBuffer().markRing;
         if (!emacs.argumentActive) {
-            markRing.insert((<vscode.TextEditor> vscode.window.activeTextEditor).selection.active);
+            markRing.insert(activeEditor().selection.active);
             markRing.pointer = 0;
             emacs.state |= emacs.STATE_MARK_ACTIVE;
         } else {
@@ -91,7 +95,7 @@ export function setMarkCommand(emacs: EmacsFlavor) {
 
             markRing.pop();
             let markPosition = markRing.mark;
-            (<vscode.TextEditor> vscode.window.activeTextEditor).selection = new vscode.Selection(markPosition, markPosition);
+            activeEditor().selection = new vscode.Selection(markPosition, markPosition);
 
             emacs.argumentActive = false;
         }
@@ -104,7 +108,7 @@ export function exchangePointAndMark(emacs: EmacsFlavor) {
         return EmacsFlavor.COMMAND_UNHANDLED;
     }
 
-    let editor = <vscode.TextEditor> vscode.window.activeTextEditor;
+    let editor = activeEditor();
     let pointPosition = editor.selection.active;
     let selection = new vscode.Selection(pointPosition, markRing.mark);
 
@@ -113,30 +117,13 @@ export function exchangePointAndMark(emacs: EmacsFlavor) {
     markRing.insert(pointPosition);
 }
 
-export function universalArgument(emacs: EmacsFlavor) {
-    emacs.argumentActive = true;
-    vscode.window.setStatusBarMessage('argument setted', 1000);
-}
-
-export function keyboardQuit(emacs: EmacsFlavor) {
-    if (emacs.state & emacs.STATE_MARK_ACTIVE) {
-        deactiveMark(emacs);
-    }
-
-    emacs.argumentActive = false;
-
-    if (undo === emacs.lastCommandHandler) {
-        emacs.redoSwitch = !emacs.redoSwitch;
-    }
-}
-
 function deactiveMark(emacs: EmacsFlavor) {
     emacs.state &= (~emacs.STATE_MARK_ACTIVE);
     vscode.commands.executeCommand('cancelSelection');
 }
 
 export function killLine() {
-    let editor  = <vscode.TextEditor> vscode.window.activeTextEditor;
+    let editor  = activeEditor();
     let document: vscode.TextDocument = editor.document;
     let pointPosition = editor.selection.active;
     let line: vscode.TextLine = document.lineAt(pointPosition);
@@ -158,7 +145,7 @@ export function killRegion(emacs: EmacsFlavor) {
         return EmacsFlavor.COMMAND_UNHANDLED;
     }
 
-    let editor = <vscode.TextEditor> vscode.window.activeTextEditor;
+    let editor = activeEditor();
     let range = editor.selection;
     let text = editor.document.getText(range);
 
@@ -178,7 +165,7 @@ export function killRingSave(emacs: EmacsFlavor) {
         return EmacsFlavor.COMMAND_UNHANDLED;
     }
 
-    let editor = <vscode.TextEditor> vscode.window.activeTextEditor;
+    let editor = activeEditor();
     let text = editor.document.getText(editor.selection);
 
     deactiveMark(emacs);
@@ -194,7 +181,7 @@ export function yank() {
         return EmacsFlavor.COMMAND_UNHANDLED;
     }
 
-    let editor = <vscode.TextEditor> vscode.window.activeTextEditor;
+    let editor = activeEditor();
     let pointPosition = editor.selection.active;
 
     buffers.getActiveBuffer().markRing.insert(pointPosition);
@@ -214,7 +201,7 @@ export function yankPop(emacs: EmacsFlavor) {
         return;
     }
 
-    let editor = <vscode.TextEditor> vscode.window.activeTextEditor;
+    let editor = activeEditor();
     let pointPosition = editor.selection.active;
     let range = new vscode.Range(buffers.getActiveBuffer().markRing.mark, pointPosition);
 
@@ -227,6 +214,63 @@ export function undo(emacs: EmacsFlavor) {
     let action = emacs.redoSwitch ? 'redo' : 'undo';
     vscode.window.setStatusBarMessage(action, 1000);
     vscode.commands.executeCommand(action);
+}
+
+function isearch(emacs: EmacsFlavor, direction: 'forward' | 'backward') {
+    if (!emacs.searchOriginPosition) {
+        emacs.searchOriginPosition = activeEditor().selection.active;
+        vscode.commands.executeCommand('actions.find');
+    } else {
+        let command = direction === 'forward' ? 'editor.action.nextMatchFindAction' : 'editor.action.previousMatchFindAction';
+        vscode.commands.executeCommand(command);
+    }
+}
+
+export function isearchForward(emacs: EmacsFlavor) {
+    isearch(emacs, 'forward');
+}
+
+export function isearchBackward(emacs: EmacsFlavor) {
+    isearch(emacs, 'backward');
+}
+
+export function isearchStop(emacs: EmacsFlavor) {
+    emacs.searchOriginPosition = null;
+    vscode.commands.executeCommand('editor.action.previousMatchFindAction').then(() => {
+        vscode.commands.executeCommand('closeFindWidget');
+    });
+}
+
+export function universalArgument(emacs: EmacsFlavor) {
+    emacs.argumentActive = true;
+    vscode.window.setStatusBarMessage('argument setted', 1000);
+}
+
+export function keyboardQuit(emacs: EmacsFlavor) {
+    if (emacs.state & emacs.STATE_MARK_ACTIVE) {
+        deactiveMark(emacs);
+    }
+
+    emacs.argumentActive = false;
+
+    if (undo === emacs.lastCommandHandler) {
+        emacs.redoSwitch = !emacs.redoSwitch;
+    }
+
+    let editor = activeEditor();
+    if (emacs.searchOriginPosition) {
+        let position = emacs.searchOriginPosition;
+
+        vscode.commands.executeCommand('closeFindWidget').then(() => {
+            return vscode.commands.executeCommand('workbench.action.focusActiveEditorGroup');
+        }).then(() => {
+            let selection = new vscode.Selection(position, position);
+            editor.selection = selection;
+            editor.revealRange(selection, vscode.TextEditorRevealType.InCenterIfOutsideViewport);
+        });
+
+        emacs.searchOriginPosition = null;
+    }
 }
 
 export function downcaseRegion() {

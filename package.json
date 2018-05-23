@@ -166,22 +166,15 @@
             },
             {
                 "key": "ctrl+s",
-                "command": "actions.find",
-                "when": "!findWidgetVisible"
-            },
-            {
-                "key": "ctrl+s",
-                "command": "editor.action.nextMatchFindAction",
-                "when": "findWidgetVisible"
+                "command": "emacs.isearch-forward"
             },
             {
                 "key": "ctrl+r",
-                "command": "actions.find",
-                "when": "!findWidgetVisible"
+                "command": "emacs.isearch-backward"
             },
             {
-                "key": "ctrl+r",
-                "command": "editor.action.previousMatchFindAction",
+                "key": "enter",
+                "command": "emacs.isearch-stop",
                 "when": "findWidgetVisible"
             },
             {
@@ -261,8 +254,7 @@
             },
             {
                 "key": "ctrl+g",
-                "command": "emacs.keyboard-quit",
-                "when": "editorTextFocus"
+                "command": "emacs.keyboard-quit"
             },
             {
                 "key": "ctrl+u",
@@ -272,11 +264,6 @@
             {
                 "key": "alt+x",
                 "command": "workbench.action.showCommands"
-            },
-            {
-                "key": "ctrl+g",
-                "command": "closeFindWidget",
-                "when": "editorFocus && findWidgetVisible"
             },
             {
                 "key": "ctrl+g",
