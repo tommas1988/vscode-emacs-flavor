@@ -1,13 +1,20 @@
 {
     "name": "vscode-emacs-flavor",
-    "displayName": "vscode-emacs-flavor",
+    "displayName": "VSCode Emacs Flavor",
     "description": "Emacs keybings in vscode.",
     "version": "0.0.1",
-    "publisher": "tommas1988",
+    "publisher": "tommas",
+    "homepage": "https://github.com/tommas1988/vscode-emacs-flavor",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/tommas1988/vscode-emacs-flavor"
+    },
+    "bugs": "https://github.com/tommas1988/vscode-emacs-flavor/issues",
     "engines": {
         "vscode": "^1.22.0"
     },
     "categories": [
+        "Keymaps",
         "Other"
     ],
     "activationEvents": [

@@ -1,65 +1,80 @@
-# vscode-emacs-flavor README
+# VSCode Emacs Flavor Keybindings
 
-This is the README for your extension "vscode-emacs-flavor". After writing up a brief description, we recommend including the following sections.
+When we use some editors other than emacs with emacs keybings, we usually could find some keydings` behavior is not go with emacs. This is a painful experience, cause we have to switch our typing habit between emacs and other fake emacs keybings.
+
+This extention is target at providing basic emacs keybings and try to make these keybinds work extractly as emacs as possible. But due to the VSCode extentions architecture, this going to be a hard work sometimes.
+
+For example, the finding function, in emacs we use `enter` to stop at current finding position, but in VSCode press `enter` will lead use to the next finding. Due to VScode listen to these key-down event in it's own finding wedget, so we cannot change this behavior only in extentions.
 
 ## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+* Work as emacs dose as possible.
+* Keep performance in mind.
+* Supporting some emacs ring concepts, like kill ring and mark ring, so there are keybings that use these rings.
 
-For example if there is an image subfolder under your extension project workspace:
+## Commands
 
-\!\[feature X\]\(images/feature-x.png\)
+### Moving Point
+| Key | Emacs Command |
+|--------|------|
+| `C-f` | forward-char |
+| `C-b` | backward-char |
+| `C-n` | next-line |
+| `C-p` | previous-line |
+| `C-a` | move-beginning-of-line |
+| `C-e` | move-end-of-line |
+| `M-f` | forward-word |
+| `M-b` | right-word |
+| `M->` | end-of-buffer |
+| `M-<` | beginning-of-buffer |
+| `C-v` | scroll-up-command |
+| `M-v` | scroll-down-command |
+| `C-l` | recenter-top-bottom |
+| `M-g g`/ `M-g M-g` | goto-line |
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+### Setting Mark
+| Key | Emacs Command |
+|--------|------|
+| `C-space` | set-mark-command |
+| `C-x C-x` | exchange-point-and-mark |
 
-## Requirements
+*`C-u C-space` will jump to the previous marked position just as emacs dose*
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+### Deletion & Killing
+| Key | Emacs Command |
+|--------|------|
+| `C-d` | delete-forward-char |
+| `C-k` | kill-line |
+| `C-w` | kill-region |
+| `M-w` | kill-ring-save |
 
-## Extension Settings
+### Yanking
+| Key | Emacs Command |
+|--------|------|
+| `C-y` | yank |
+| `M-y` | yank-pop |
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
+### Files & Buffer
+| Key | Emacs Command |
+|--------|------|
+| `C-x C-s` | save-buffer |
+| `C-x b` | switch-to-buffer |
 
-For example:
+### Search
+| Key | Emacs Command |
+|--------|------|
+| `C-s` | isearch-forward |
+| `C-r` | isearch-backward |
 
-This extension contributes the following settings:
+### misc.
+| Key | Emacs Command |
+|--------|------|
+| `C-g` | keyboard-quit |
+| `M-x` | execute-extended-command |
+| `C-x C-l` | downcase-region |
+| `C-x C-u` | upcase-region |
+| `C-/` | undo |
 
-* `myExtension.enable`: enable/disable this extension
-* `myExtension.thing`: set to `blah` to do something
-
-## Known Issues
-
-Calling out known issues can help limit users opening duplicate issues against your extension.
-
-## Release Notes
-
-Users appreciate release notes as you update your extension.
-
-### 1.0.0
-
-Initial release of ...
-
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
-
------------------------------------------------------------------------------------------------------------
-
-## Working with Markdown
-
-**Note:** You can author your README using Visual Studio Code.  Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux)
-* Toggle preview (`Shift+CMD+V` on macOS or `Shift+Ctrl+V` on Windows and Linux)
-* Press `Ctrl+Space` (Windows, Linux) or `Cmd+Space` (macOS) to see a list of Markdown snippets
-
-### For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
+*`undo` follows `keyboard-quit` will lead `C-/` to perform `redo`*
 
 **Enjoy!**
