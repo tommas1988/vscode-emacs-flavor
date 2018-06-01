@@ -94,7 +94,7 @@ export function setMarkCommand(emacs: EmacsFlavor) {
             let selection = new vscode.Selection(markPosition, markPosition);
             let editor = <vscode.TextEditor> vscode.window.activeTextEditor;
             editor.selection = selection;
-            editor.revealRange(selection, vscode.TextEditorRevealType.InCenter);
+            editor.revealRange(selection, vscode.TextEditorRevealType.InCenterIfOutsideViewport);
 
             emacs.argumentActive = false;
         }
@@ -109,9 +109,10 @@ export function exchangePointAndMark(emacs: EmacsFlavor) {
 
     let editor = <vscode.TextEditor> vscode.window.activeTextEditor;
     let pointPosition = editor.selection.active;
-    let selection = new vscode.Selection(pointPosition, markRing.mark);
 
-    editor.selection = selection;
+    editor.selection = new vscode.Selection(pointPosition, markRing.mark);
+    editor.revealRange(new vscode.Selection(markRing.mark, markRing.mark), vscode.TextEditorRevealType.InCenterIfOutsideViewport);
+
     emacs.state |= emacs.STATE_MARK_ACTIVE;
     markRing.insert(pointPosition);
 }
