@@ -3,7 +3,7 @@
     "displayName": "VSCode Emacs Flavor",
     "description": "Emacs keybings in vscode.",
     "icon": "emacs.png",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "publisher": "tommas",
     "homepage": "https://github.com/tommas1988/vscode-emacs-flavor",
     "repository": {
@@ -106,12 +106,12 @@
             },
             {
                 "key": "alt+shift+.",
-                "command": "emacs.beginning-of-buffer",
+                "command": "emacs.end-of-buffer",
                 "when": "editorTextFocus"
             },
             {
                 "key": "alt+shift+,",
-                "command": "emacs.end-of-buffer",
+                "command": "emacs.beginning-of-buffer",
                 "when": "editorTextFocus"
             },
             {
@@ -239,7 +239,7 @@
             },
             {
                 "key": "ctrl+x h",
-                "command": "editor.action.selectAll",
+                "command": "emacs.mark-whole-buffer",
                 "when": "editorTextFocus"
             },
             {

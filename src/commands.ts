@@ -91,7 +91,10 @@ export function setMarkCommand(emacs: EmacsFlavor) {
 
             markRing.pop();
             let markPosition = markRing.mark;
-            (<vscode.TextEditor> vscode.window.activeTextEditor).selection = new vscode.Selection(markPosition, markPosition);
+            let selection = new vscode.Selection(markPosition, markPosition);
+            let editor = <vscode.TextEditor> vscode.window.activeTextEditor;
+            editor.selection = selection;
+            editor.revealRange(selection, vscode.TextEditorRevealType.InCenter);
 
             emacs.argumentActive = false;
         }
@@ -111,6 +114,20 @@ export function exchangePointAndMark(emacs: EmacsFlavor) {
     editor.selection = selection;
     emacs.state |= emacs.STATE_MARK_ACTIVE;
     markRing.insert(pointPosition);
+}
+
+export function markWholeBuffer(emacs: EmacsFlavor) {
+    let editor = <vscode.TextEditor> vscode.window.activeTextEditor;
+    let document = editor.document;
+    let endPosition = document.lineAt(document.lineCount-1).range.end;
+
+    let markRing = buffers.getActiveBuffer().markRing;
+    editor.selection = new vscode.Selection(endPosition, endPosition);
+    markRing.insert(endPosition);
+    markRing.pointer = 0;
+    emacs.state |= emacs.STATE_MARK_ACTIVE;
+
+    beginningOfBuffer(emacs);
 }
 
 export function universalArgument(emacs: EmacsFlavor) {
