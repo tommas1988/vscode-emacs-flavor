@@ -37,6 +37,7 @@ For example, the finding function, in emacs we use `enter` to stop at current fi
 |--------|------|
 | `C-space` | set-mark-command |
 | `C-x C-x` | exchange-point-and-mark |
+| `C-x h` | mark-whole-buffer |
 
 *`C-u C-space` will jump to the previous marked position just as emacs dose*
 
