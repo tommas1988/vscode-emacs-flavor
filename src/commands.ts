@@ -89,8 +89,7 @@ export function setMarkCommand(emacs: EmacsFlavor) {
                 deactiveMark(emacs);
             }
 
-            markRing.pop();
-            let markPosition = markRing.mark;
+            let markPosition = markRing.pop();
             let selection = new vscode.Selection(markPosition, markPosition);
             let editor = <vscode.TextEditor> vscode.window.activeTextEditor;
             editor.selection = selection;
